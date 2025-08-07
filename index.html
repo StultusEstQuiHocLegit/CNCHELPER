@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNC Helper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top toolbar -->
+  <div id="topBar">
+    <div class="toolbar-left">
+      <button id="addTextBtn" title="Add Text">Add Text</button>
+      <button id="uploadBtn" title="Upload Image">Upload Image</button>
+      <button id="addFormBtn" title="Add a shape/form">Add Form</button>
+      <button id="measureBtn" title="Measure distances">Measure</button>
+    </div>
+    <div class="toolbar-right">
+      <button id="downloadBtn" title="Download SVGs">Download</button>
+    </div>
+  </div>
+
+  <!-- Hidden file input for uploads -->
+  <input type="file" id="fileInput" accept=".svg,.png,.jpeg,.jpg,.jpg,.svg" multiple style="display:none">
+
+  <!-- Canvas wrapper with axes -->
+  <div id="canvasContainer">
+    <!-- Horizontal axis labels -->
+    <div id="xAxisLabels"></div>
+    <!-- Vertical axis labels -->
+    <div id="yAxisLabels"></div>
+    <!-- Fabric.js canvas element -->
+    <canvas id="c" width="1000" height="1000"></canvas>
+  </div>
+
+  <!-- Bottom bar -->
+  <div id="bottomBar">
+    <div class="bottom-left">
+      <!-- Unit toggle: simple clickable text. Shows current unit (mm or inch) and toggles on click -->
+      <span id="unitToggle" class="unit-toggle" title="Toggle between millimetres and inches">mm</span>
+    </div>
+    <div class="bottom-right">
+      <label for="widthInput" title="Work area width" style="margin-right:4px;">W:</label>
+      <input type="number" id="widthInput" min="0" step="0.01" title="Set the width of the work area" style="width:70px;">
+      <span id="widthUnitLabel" title="Current unit (mm/inch)" style="margin-right:12px;">mm</span>
+      <label for="heightInput" title="Work area height" style="margin-right:4px;">H:</label>
+      <input type="number" id="heightInput" min="0" step="0.01" title="Set the height of the work area" style="width:70px;">
+      <span id="heightUnitLabel" title="Current unit (mm/inch)">mm</span>
+    </div>
+  </div>
+
+  <!-- Font selection dropdown (hidden by default) -->
+  <div id="fontSelector" class="popover hidden">
+    <label>Choose font:</label>
+    <select id="fontDropdown" title="Select a font for the selected text"></select>
+  </div>
+
+  <!-- Cut/engrave toggle icon (drill icon placeholder) -->
+  <div id="cutToggle" class="popover hidden">
+    <button id="cutToggleBtn" title="Toggle between engraving (black) and cutting (orange)">Toggle Cut</button>
+  </div>
+
+  <!-- Fill toggle: switch between outline and filled shape -->
+  <div id="fillToggle" class="popover hidden">
+    <button id="fillToggleBtn" title="Toggle between filled and outline shape">Toggle Fill</button>
+  </div>
+
+  <!-- Form selection menu: appears when Add Form is clicked -->
+  <div id="formMenu" class="popover hidden">
+    <!-- Buttons will be generated via script -->
+  </div>
+
+  <!-- Layer controls popover: provide ordering operations for selected object(s) -->
+  <div id="layerControls" class="popover hidden">
+    <button id="sendToBackBtn" title="Send to back">«</button>
+    <button id="sendBackwardsBtn" title="Send backward one layer">←</button>
+    <button id="bringForwardBtn" title="Bring forward one layer">→</button>
+    <button id="bringToFrontBtn" title="Bring to front">»</button>
+  </div>
+
+  <!-- Libraries -->
+  <script src="fabric.min.js"></script>
+  <script src="imagetracer.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

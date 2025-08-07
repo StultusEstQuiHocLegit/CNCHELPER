@@ -1,0 +1,226 @@
+/* General styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+button {
+  padding: 6px 14px;
+  margin: 0 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+button:hover {
+  background-color: #e9e9e9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #007bff; /* blue text on hover */
+}
+
+/* Active buttons (e.g. Add Form and Measure when toggled) */
+button.active {
+  color: #007bff;
+}
+
+/* Top toolbar */
+#topBar {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Canvas container */
+#canvasContainer {
+  position: absolute;
+  top: 40px; /* height of topBar */
+  bottom: 40px; /* height of bottomBar */
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  background-color: #fafafa;
+}
+
+/* Axis label containers */
+#xAxisLabels {
+  position: absolute;
+  top: 0;
+  left: 40px; /* space for y axis labels */
+  height: 20px;
+  right: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-start;
+  font-size: 10px;
+  color: #888;
+}
+#yAxisLabels {
+  position: absolute;
+  top: 20px; /* space for x axis labels */
+  left: 0;
+  width: 40px;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 10px;
+  color: #888;
+}
+
+/* Canvas element */
+#c {
+  position: absolute;
+  top: 20px; /* offset for x axis labels */
+  left: 40px; /* offset for y axis labels */
+  background-color: transparent;
+  cursor: default;
+}
+
+/* Bottom bar */
+#bottomBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border-top: 1px solid #ccc;
+  font-size: 14px;
+  box-shadow: 0 -1px 2px rgba(0,0,0,0.05);
+}
+.bottom-left {
+  display: flex;
+  align-items: center;
+}
+.bottom-left label {
+  margin-right: 4px;
+}
+.bottom-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Style for dimension inputs and unit dropdown */
+.bottom-left select {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 6px;
+  background-color: #fafafa;
+  font-size: 14px;
+  color: #333;
+}
+.bottom-right input {
+  width: 70px;
+  padding: 4px 6px;
+  margin-left: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fafafa;
+  font-size: 14px;
+  color: #333;
+}
+.bottom-right span {
+  margin-left: 2px;
+  margin-right: 8px;
+}
+
+/* Styling for the unit toggle element */
+.unit-toggle {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background-color: #fafafa;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  user-select: none;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.unit-toggle:hover {
+  background-color: #e9e9e9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #007bff; /* blue text on hover like buttons */
+}
+
+/* Popover (font selector and cut toggle) */
+.popover {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  padding: 8px;
+  z-index: 1000;
+  font-size: 13px;
+  white-space: nowrap;
+}
+/* Force hidden elements to not display. Use !important so it
+   overrides specific display rules like #formMenu { display:flex; }.
+   This ensures that popover menus properly hide when the hidden
+   class is applied. */
+.hidden {
+  display: none !important;
+}
+
+/* Font dropdown styling */
+#fontDropdown {
+  width: 220px;
+}
+
+/* Ensure the font selector popover has enough width to show the label */
+#fontSelector {
+  min-width: 260px;
+}
+
+/* cut toggle icon button */
+#cutToggleBtn {
+  font-size: 12px;
+}
+
+/* Form menu layout */
+#formMenu {
+  max-width: 300px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+#formMenu button {
+  margin: 2px;
+  padding: 4px 6px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+#formMenu button:hover {
+  /* Make form menu buttons behave like other buttons on hover: give
+     them a subtle background and blue text to indicate interactivity. */
+  background-color: #e9e9e9;
+  color: #007bff;
+}
