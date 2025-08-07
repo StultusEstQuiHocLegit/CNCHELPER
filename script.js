@@ -668,7 +668,7 @@
       sendBtn.id = 'sendBtn';
       const sendLabel = 'SEND TO ' + (companyParam ? companyParam.toUpperCase() : 'MANUFACTURER');
       sendBtn.textContent = sendLabel;
-      downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn);
+      downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn.nextSibling);
       sendBtn.addEventListener('click', () => {
         const original = sendBtn.textContent;
         sendSVGs(emailParam).then(() => {
