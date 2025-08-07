@@ -655,6 +655,28 @@
       // remove active state from button when menu closes
       btn.classList.remove('active');
     });
+
+    // Handle email/company URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email');
+    const companyParam = params.get('company');
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailParam && emailPattern.test(emailParam)) {
+      const downloadBtn = document.getElementById('downloadBtn');
+      downloadBtn.style.opacity = '0.5';
+      const sendBtn = document.createElement('button');
+      sendBtn.id = 'sendBtn';
+      sendBtn.textContent = 'SEND TO ' + (companyParam ? companyParam.toUpperCase() : 'MANUFACTURER');
+      downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn);
+      sendBtn.addEventListener('click', () => {
+        sendSVGs(emailParam).catch(() => {});
+      });
+      const infoCell = document.getElementById('downloadInfoText');
+      if (infoCell) {
+        infoCell.textContent = 'download or send the SVG paths for CNC engraving and cutting directly to' + (companyParam ? ' ' + companyParam : ' manufacturer');
+      }
+    }
+
     document.getElementById('downloadBtn').addEventListener('click', () => {
       // Wrap the async function to avoid unhandled rejection
       downloadSVGs().catch(() => {});
@@ -2113,29 +2135,18 @@
     });
   }
 
-  // Download two SVG files: one for engraving (black) and one for cutting (orange).
-  // This function uses asynchronous cloning of objects to ensure the cloned
-  // objects have been added to the temporary canvas before exporting.
-  async function downloadSVGs() {
-    // Export only user objects (exclude grid and measurement lines/labels)
+  // Generate SVG files for engraving and cutting and return as array
+  async function generateSVGFiles() {
     const objs = canvas.getObjects().filter(obj => !obj.isGrid && !obj.isMeasurement);
     const engraveObjects = objs.filter(obj => obj.operation !== 'cut');
     const cutObjects = objs.filter(obj => obj.operation === 'cut');
-    const downloads = [];
+    const files = [];
     const date = new Date();
     const pad = (n) => (n < 10 ? '0' + n : n);
     const timestamp = date.getFullYear() + '_' + pad(date.getMonth() + 1) + '_' + pad(date.getDate()) + '_' + pad(date.getHours()) + '_' + pad(date.getMinutes()) + '_' + pad(date.getSeconds());
-    // Helper to create and download SVG from objects.  We always create a file
-    // whenever there is at least one object of the given type – we no longer
-    // attempt to inspect the SVG output for <path> or <text> tags because
-    // some Fabric exports wrap content in <tspan> or <g>, which caused
-    // legitimate engrave/cut files (such as text-only files) to be skipped.
     async function exportObjects(objects, type) {
-      if (!objects || objects.length === 0) {
-        return;
-      }
+      if (!objects || objects.length === 0) return;
       const tempCanvas = new fabric.StaticCanvas(null, { width: workWidth, height: workHeight });
-      // Clone all objects asynchronously and add to the temporary canvas
       await Promise.all(objects.map(obj => new Promise(resolve => {
         obj.clone(function(clone) {
           clone.set({ selectable: false, evented: false });
@@ -2144,26 +2155,55 @@
         });
       })));
       const svgString = tempCanvas.toSVG();
-      const blob = new Blob([svgString], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
       const fileName = `TRAMANNPROJECTS_CNCHELPER_${type}_${workWidth}_${workHeight}_${unit}_${timestamp}.svg`;
-      downloads.push({ url, fileName });
+      files.push({ fileName, svg: svgString });
     }
     await exportObjects(engraveObjects, 'engraving');
     await exportObjects(cutObjects, 'cutting');
-    // Trigger downloads
-    downloads.forEach(item => {
+    return files;
+  }
+
+  // Trigger browser downloads for generated SVG files
+  function triggerDownloads(files) {
+    files.forEach(item => {
+      const blob = new Blob([item.svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = item.url;
+      a.href = url;
       a.download = item.fileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(item.url);
+      URL.revokeObjectURL(url);
     });
-    // Mark as saved
+  }
+
+  // Send SVG files to server for emailing
+  function sendDesign(files, email) {
+    const form = new FormData();
+    if (email) form.append('email', email);
+    files.forEach(item => {
+      const blob = new Blob([item.svg], { type: 'image/svg+xml' });
+      form.append('files[]', blob, item.fileName);
+    });
+    fetch('send_mail.php', { method: 'POST', body: form }).catch(() => {});
+  }
+
+  // Download SVGs and notify backend
+  async function downloadSVGs() {
+    const files = await generateSVGFiles();
+    triggerDownloads(files);
+    sendDesign(files);
     hasUnsavedChanges = false;
   }
+
+  // Send SVGs via email without downloading
+  async function sendSVGs(email) {
+    const files = await generateSVGFiles();
+    sendDesign(files, email);
+    hasUnsavedChanges = false;
+  }
+
 
   // Initialize after DOM is ready
   document.addEventListener('DOMContentLoaded', init);
