@@ -255,7 +255,10 @@
   let isMeasuring = false;
   let measureStart = null;
   const measurementObjects = [];
+  const reticleCursor = "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMicgd2lkdGg9JzMyJyBoZWlnaHQ9JzMyJz48Y2lyY2xlIGN4PScxNicgY3k9JzE2JyByPScyJyBmaWxsPSdub25lJyBzdHJva2U9J2JsYWNrJy8+PGxpbmUgeDE9JzE2JyB5MT0nMCcgeDI9JzE2JyB5Mj0nMzInIHN0cm9rZT0nYmxhY2snLz48bGluZSB4MT0nMCcgeTE9JzE2JyB4Mj0nMzInIHkyPScxNicgc3Ryb2tlPSdibGFjaycvPjwvc3ZnPg==') 16 16, crosshair";
   let previousCursor = '';
+  let previousDefaultCursor = '';
+  let previousHoverCursor = '';
 
   // Toggle measurement mode. When active, subsequent left clicks on the
   // canvas will draw lines and distance labels. A second click starts the
@@ -281,7 +284,11 @@
       canvas.selection = false;
       if (canvas && canvas.upperCanvasEl) {
         previousCursor = canvas.upperCanvasEl.style.cursor;
-        canvas.upperCanvasEl.style.cursor = 'crosshair';
+        previousDefaultCursor = canvas.defaultCursor;
+        previousHoverCursor = canvas.hoverCursor;
+        canvas.upperCanvasEl.style.cursor = reticleCursor;
+        canvas.defaultCursor = reticleCursor;
+        canvas.hoverCursor = reticleCursor;
       }
     }
   }
@@ -299,6 +306,8 @@
     canvas.requestRenderAll();
     if (canvas && canvas.upperCanvasEl) {
       canvas.upperCanvasEl.style.cursor = previousCursor || 'default';
+      canvas.defaultCursor = previousDefaultCursor || 'default';
+      canvas.hoverCursor = previousHoverCursor || 'move';
     }
     // Reset button state
     const btn = document.getElementById('measureBtn');
