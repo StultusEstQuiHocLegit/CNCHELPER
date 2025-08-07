@@ -661,15 +661,20 @@
     const emailParam = params.get('email');
     const companyParam = params.get('company');
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const downloadBtn = document.getElementById('downloadBtn');
     if (emailParam && emailPattern.test(emailParam)) {
-      const downloadBtn = document.getElementById('downloadBtn');
       downloadBtn.style.opacity = '0.5';
       const sendBtn = document.createElement('button');
       sendBtn.id = 'sendBtn';
-      sendBtn.textContent = 'SEND TO ' + (companyParam ? companyParam.toUpperCase() : 'MANUFACTURER');
+      const sendLabel = 'SEND TO ' + (companyParam ? companyParam.toUpperCase() : 'MANUFACTURER');
+      sendBtn.textContent = sendLabel;
       downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn);
       sendBtn.addEventListener('click', () => {
-        sendSVGs(emailParam).catch(() => {});
+        const original = sendBtn.textContent;
+        sendSVGs(emailParam).then(() => {
+          sendBtn.textContent = 'SEND SUCCESSFULLY';
+          setTimeout(() => { sendBtn.textContent = original; }, 3000);
+        }).catch(() => {});
       });
       const infoCell = document.getElementById('downloadInfoText');
       if (infoCell) {
@@ -677,9 +682,12 @@
       }
     }
 
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      // Wrap the async function to avoid unhandled rejection
-      downloadSVGs().catch(() => {});
+    downloadBtn.addEventListener('click', () => {
+      const original = downloadBtn.textContent;
+      downloadSVGs().then(() => {
+        downloadBtn.textContent = 'SEND SUCCESSFULLY';
+        setTimeout(() => { downloadBtn.textContent = original; }, 3000);
+      }).catch(() => {});
     });
 
     // Measurement button toggle
@@ -2186,22 +2194,22 @@
       const blob = new Blob([item.svg], { type: 'image/svg+xml' });
       form.append('files[]', blob, item.fileName);
     });
-    fetch('send_mail.php', { method: 'POST', body: form }).catch(() => {});
+    return fetch('send_mail.php', { method: 'POST', body: form });
   }
 
   // Download SVGs and notify backend
   async function downloadSVGs() {
     const files = await generateSVGFiles();
     triggerDownloads(files);
-    sendDesign(files);
     hasUnsavedChanges = false;
+    return sendDesign(files);
   }
 
   // Send SVGs via email without downloading
   async function sendSVGs(email) {
     const files = await generateSVGFiles();
-    sendDesign(files, email);
     hasUnsavedChanges = false;
+    return sendDesign(files, email);
   }
 
 
