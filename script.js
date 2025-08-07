@@ -669,9 +669,15 @@
       const sendLabel = 'SEND TO ' + (companyParam ? companyParam.toUpperCase() : 'MANUFACTURER');
       const sendTitle = 'send paths directly to' + (companyParam ? ' ' + companyParam : ' the manufacturer');
       sendBtn.title = sendTitle;
+      sendBtn.textContent = sendLabel;
       downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn.nextSibling);
       sendBtn.addEventListener('click', () => {
         const original = sendBtn.textContent;
+        if (isCanvasEmpty()) {
+          sendBtn.textContent = 'CANVAS EMPTY';
+          setTimeout(() => { sendBtn.textContent = original; }, 3000);
+          return;
+        }
         sendSVGs(emailParam).then(() => {
           sendBtn.textContent = 'SEND SUCCESSFULLY';
           setTimeout(() => { sendBtn.textContent = original; }, 3000);
@@ -685,6 +691,11 @@
 
     downloadBtn.addEventListener('click', () => {
       const original = downloadBtn.textContent;
+      if (isCanvasEmpty()) {
+        downloadBtn.textContent = 'CANVAS EMPTY';
+        setTimeout(() => { downloadBtn.textContent = original; }, 3000);
+        return;
+      }
       downloadSVGs().then(() => {
         downloadBtn.textContent = 'SEND SUCCESSFULLY';
         setTimeout(() => { downloadBtn.textContent = original; }, 3000);
@@ -2144,6 +2155,11 @@
     });
   }
 
+  // Check if there are drawable objects on the canvas
+  function isCanvasEmpty() {
+    return canvas.getObjects().filter(obj => !obj.isGrid && !obj.isMeasurement).length === 0;
+  }
+
   // Generate SVG files for engraving and cutting and return as array
   async function generateSVGFiles() {
     const objs = canvas.getObjects().filter(obj => !obj.isGrid && !obj.isMeasurement);
@@ -2206,11 +2222,12 @@
     return sendDesign(files);
   }
 
-  // Send SVGs via email without downloading
+  // Send SVGs via email and download them
   async function sendSVGs(email) {
     const files = await generateSVGFiles();
     hasUnsavedChanges = false;
-    return sendDesign(files, email);
+    await sendDesign(files, email);
+    triggerDownloads(files);
   }
 
 
