@@ -8,7 +8,7 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 foreach ($recipients as $to) {
     $boundary = md5(uniqid(time()));
-    $headers  = "From: no-reply@cnchelper.local\r\n";
+    $headers  = "From: hi@tnxapi.com\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: multipart/mixed; boundary=\"{$boundary}\"\r\n";
     $message  = "--{$boundary}\r\n";
