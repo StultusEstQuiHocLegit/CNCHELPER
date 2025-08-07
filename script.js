@@ -764,7 +764,8 @@
     window.addEventListener('beforeunload', function(e) {
       if (hasUnsavedChanges && canvas.getObjects().filter(obj => !obj.isGrid).length > 0) {
         const msg = 'You have unsaved changes. Are you sure you want to leave?';
-        e.returnValue = msg;
+        e.preventDefault();
+        e.returnValue = msg; // Required for some browsers
         return msg;
       }
     });
