@@ -2174,6 +2174,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('infoOverlay');
   const btn = document.getElementById('gotItBtn');
   if (overlay && btn) {
+    overlay.style.display = 'flex';
     btn.addEventListener('click', () => {
       overlay.style.display = 'none';
     });
