@@ -668,7 +668,6 @@
       sendBtn.id = 'sendBtn';
       const sendLabel = 'SEND TO ' + (companyParam ? `<b>${companyParam.toUpperCase()}</b>` : 'MANUFACTURER');
       const sendTitle = 'send paths directly to' + (companyParam ? ' ' + companyParam : ' the manufacturer');
-      sendBtn.title = sendTitle;
       sendBtn.textContent = sendLabel;
       sendBtn.innerHTML = sendLabel;
       downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn.nextSibling);
@@ -676,7 +675,7 @@
        const original = sendBtn.innerHTML;
        if (isCanvasEmpty()) {
           sendBtn.textContent = 'CANVAS EMPTY';
-          setTimeout(() => { sendBtn.textContent = original; }, 3000);
+          setTimeout(() => { sendBtn.innerHTML = original; }, 3000);
           return;
         }
         sendSVGs(emailParam).then(() => {
