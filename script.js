@@ -2000,7 +2000,7 @@
       // Remove the 'Outline' suffix from labels for cleaner display
       const labelKey = labels[key] || key;
       const cleanLabel = labelKey.replace(/\s*\(outline\)/i, '').trim();
-      btn.textContent = cleanLabel;
+      btn.textContent = cleanLabel.toUpperCase();
       btn.dataset.shapeKey = key;
       btn.title = 'Insert ' + cleanLabel;
       btn.addEventListener('click', (ev) => {
