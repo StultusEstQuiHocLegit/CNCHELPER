@@ -243,6 +243,7 @@ button.active {
   padding: 20px 30px;
   border-radius: 8px;
   text-align: center;
+  width: 400px;
 }
 
 #infoBox h1 {
@@ -258,6 +259,7 @@ button.active {
 
 #infoBox td {
   text-align: justify;
+  vertical-align: top;
 }
 
 #infoBox .hover-hint {
