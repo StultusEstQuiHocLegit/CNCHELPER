@@ -667,7 +667,8 @@
       const sendBtn = document.createElement('button');
       sendBtn.id = 'sendBtn';
       const sendLabel = 'SEND TO ' + (companyParam ? companyParam.toUpperCase() : 'MANUFACTURER');
-      sendBtn.textContent = sendLabel;
+      const sendTitle = 'send paths directly to' + (companyParam ? ' ' + companyParam : ' the manufacturer');
+      sendBtn.title = sendTitle;
       downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn.nextSibling);
       sendBtn.addEventListener('click', () => {
         const original = sendBtn.textContent;
