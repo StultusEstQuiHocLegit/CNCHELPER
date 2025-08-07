@@ -2011,7 +2011,7 @@
       const cleanLabel = labelKey.replace(/\s*\(outline\)/i, '').trim();
       btn.textContent = cleanLabel;
       btn.dataset.shapeKey = key;
-      btn.title = 'Insert ' + cleanLabel;
+      btn.title = 'insert ' + cleanLabel.toLowerCase();
       btn.addEventListener('click', (ev) => {
         // Prevent the click from propagating to the Add Form button or
         // other handlers which might immediately reopen the menu.

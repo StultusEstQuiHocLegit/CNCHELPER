@@ -10,13 +10,13 @@
   <!-- Top toolbar -->
   <div id="topBar">
     <div class="toolbar-left">
-      <button id="addTextBtn" title="Add Text">Add Text</button>
-      <button id="uploadBtn" title="Upload Image">Upload Image</button>
-      <button id="addFormBtn" title="Add a shape/form">Add Form</button>
-      <button id="measureBtn" title="Measure distances">Measure</button>
+        <button id="addTextBtn" title="add text">Add Text</button>
+        <button id="uploadBtn" title="upload image">Upload Image</button>
+        <button id="addFormBtn" title="add a shape/form">Add Form</button>
+        <button id="measureBtn" title="measure distances">Measure</button>
     </div>
     <div class="toolbar-right">
-      <button id="downloadBtn" title="Download SVGs">Download</button>
+        <button id="downloadBtn" title="download svgs">Download</button>
     </div>
   </div>
 
@@ -37,32 +37,32 @@
   <div id="bottomBar">
     <div class="bottom-left">
       <!-- Unit toggle: simple clickable text. Shows current unit (mm or inch) and toggles on click -->
-      <span id="unitToggle" class="unit-toggle" title="Toggle between millimetres and inches">mm</span>
+        <span id="unitToggle" class="unit-toggle" title="toggle between millimetres and inches">mm</span>
     </div>
     <div class="bottom-right">
-      <label for="widthInput" title="Work area width" style="margin-right:4px;">W:</label>
-      <input type="number" id="widthInput" min="0" step="0.01" title="Set the width of the work area" style="width:70px;">
-      <span id="widthUnitLabel" title="Current unit (mm/inch)" style="margin-right:12px;">mm</span>
-      <label for="heightInput" title="Work area height" style="margin-right:4px;">H:</label>
-      <input type="number" id="heightInput" min="0" step="0.01" title="Set the height of the work area" style="width:70px;">
-      <span id="heightUnitLabel" title="Current unit (mm/inch)">mm</span>
+      <label for="widthInput" title="work area width" style="margin-right:4px;">W:</label>
+      <input type="number" id="widthInput" min="0" step="0.01" title="set the width of the work area" style="width:70px;">
+      <span id="widthUnitLabel" title="current unit (mm/inch)" style="margin-right:12px;">mm</span>
+      <label for="heightInput" title="work area height" style="margin-right:4px;">H:</label>
+      <input type="number" id="heightInput" min="0" step="0.01" title="set the height of the work area" style="width:70px;">
+      <span id="heightUnitLabel" title="current unit (mm/inch)">mm</span>
     </div>
   </div>
 
   <!-- Font selection dropdown (hidden by default) -->
   <div id="fontSelector" class="popover hidden">
     <label>Choose font:</label>
-    <select id="fontDropdown" title="Select a font for the selected text"></select>
+      <select id="fontDropdown" title="select a font for the selected text"></select>
   </div>
 
   <!-- Cut/engrave toggle icon (drill icon placeholder) -->
   <div id="cutToggle" class="popover hidden">
-    <button id="cutToggleBtn" title="Toggle between engraving (black) and cutting (orange)">Toggle Cut</button>
+      <button id="cutToggleBtn" title="toggle between engraving (black) and cutting (orange)">Toggle Cut</button>
   </div>
 
   <!-- Fill toggle: switch between outline and filled shape -->
   <div id="fillToggle" class="popover hidden">
-    <button id="fillToggleBtn" title="Toggle between filled and outline shape">Toggle Fill</button>
+      <button id="fillToggleBtn" title="toggle between filled and outline shape">Toggle Fill</button>
   </div>
 
   <!-- Form selection menu: appears when Add Form is clicked -->
@@ -72,10 +72,10 @@
 
   <!-- Layer controls popover: provide ordering operations for selected object(s) -->
   <div id="layerControls" class="popover hidden">
-    <button id="sendToBackBtn" title="Send to back">«</button>
-    <button id="sendBackwardsBtn" title="Send backward one layer">←</button>
-    <button id="bringForwardBtn" title="Bring forward one layer">→</button>
-    <button id="bringToFrontBtn" title="Bring to front">»</button>
+      <button id="sendToBackBtn" title="send to back">«</button>
+      <button id="sendBackwardsBtn" title="send backward one layer">←</button>
+      <button id="bringForwardBtn" title="bring forward one layer">→</button>
+      <button id="bringToFrontBtn" title="bring to front">»</button>
   </div>
 
   <!-- Libraries -->
