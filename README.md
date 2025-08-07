@@ -60,7 +60,7 @@ A web-based tool for preparing and arranging black-and-white SVGs for laser cutt
   - Clicking toggles between **black (engraving)** and **orange (cutting)**
   - Toggled color is applied to all path content of the object
 
-### ⚙️ Export
+### ↗️ Export
 - **Download button** in **top-right corner**
 - Exports **two SVG files**:
   1. **Engraving** file (black only):
