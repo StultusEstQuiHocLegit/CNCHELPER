@@ -255,6 +255,7 @@
   let isMeasuring = false;
   let measureStart = null;
   const measurementObjects = [];
+  let previousCursor = '';
 
   // Toggle measurement mode. When active, subsequent left clicks on the
   // canvas will draw lines and distance labels. A second click starts the
@@ -278,6 +279,10 @@
       btn.classList.add('active');
       // Disable selection so clicks do not select objects during measuring
       canvas.selection = false;
+      if (canvas && canvas.upperCanvasEl) {
+        previousCursor = canvas.upperCanvasEl.style.cursor;
+        canvas.upperCanvasEl.style.cursor = 'crosshair';
+      }
     }
   }
 
@@ -292,6 +297,9 @@
     measurementObjects.length = 0;
     canvas.selection = true;
     canvas.requestRenderAll();
+    if (canvas && canvas.upperCanvasEl) {
+      canvas.upperCanvasEl.style.cursor = previousCursor || 'default';
+    }
     // Reset button state
     const btn = document.getElementById('measureBtn');
     if (btn) btn.classList.remove('active');
@@ -1487,16 +1495,7 @@
       });
     },
     'starFilled': () => {
-      // 5-point star
-      const points = [];
-      const spikes = 5;
-      const outerRadius = 50;
-      const innerRadius = 20;
-      for (let i = 0; i < spikes * 2; i++) {
-        const angle = i * Math.PI / spikes;
-        const r = (i % 2 === 0) ? outerRadius : innerRadius;
-        points.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r });
-      }
+      const points = starPoints(5, 50, 20);
       return new fabric.Polygon(points, {
         fill: '#000000',
         stroke: null,
@@ -1505,15 +1504,7 @@
       });
     },
     'starOutline': () => {
-      const points = [];
-      const spikes = 5;
-      const outerRadius = 50;
-      const innerRadius = 20;
-      for (let i = 0; i < spikes * 2; i++) {
-        const angle = i * Math.PI / spikes;
-        const r = (i % 2 === 0) ? outerRadius : innerRadius;
-        points.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r });
-      }
+      const points = starPoints(5, 50, 20);
       return new fabric.Polygon(points, {
         fill: 'transparent',
         stroke: '#000000',
