@@ -667,7 +667,7 @@
       const sendBtn = document.createElement('button');
       sendBtn.id = 'sendBtn';
       sendBtn.textContent = 'SEND TO ' + (companyParam ? companyParam.toUpperCase() : 'MANUFACTURER');
-      downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn);
+      downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn.nextSibling);
       sendBtn.addEventListener('click', () => {
         sendSVGs(emailParam).catch(() => {});
       });
