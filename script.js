@@ -2168,3 +2168,14 @@
   // Initialize after DOM is ready
   document.addEventListener('DOMContentLoaded', init);
 })();
+
+// Show info overlay on load and hide it when acknowledged
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('infoOverlay');
+  const btn = document.getElementById('gotItBtn');
+  if (overlay && btn) {
+    btn.addEventListener('click', () => {
+      overlay.style.display = 'none';
+    });
+  }
+});
