@@ -91,5 +91,5 @@ This is a static HTML/JS/CSS application. You can:
 
 ---
 
-### 👤 Created by
+### 👑 Created by
 **TRAMANNPROJECTS** – CNC Helper Web Edition  
