@@ -2213,10 +2213,26 @@
 document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('infoOverlay');
   const btn = document.getElementById('gotItBtn');
+  const cookieName = 'infoBoxSeen';
+
+  function hasInfoCookie() {
+    return document.cookie.split(';').some(c => c.trim().startsWith(`${cookieName}=`));
+  }
+
+  function setInfoCookie() {
+    const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
+    document.cookie = `${cookieName}=true; expires=${expires.toUTCString()}; path=/`;
+  }
+
   if (overlay && btn) {
-    overlay.style.display = 'flex';
-    btn.addEventListener('click', () => {
+    if (hasInfoCookie()) {
       overlay.style.display = 'none';
-    });
+    } else {
+      overlay.style.display = 'flex';
+      btn.addEventListener('click', () => {
+        overlay.style.display = 'none';
+        setInfoCookie();
+      });
+    }
   }
 });
