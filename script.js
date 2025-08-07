@@ -666,15 +666,16 @@
       downloadBtn.style.opacity = '0.5';
       const sendBtn = document.createElement('button');
       sendBtn.id = 'sendBtn';
-      const sendLabel = 'SEND TO ' + (companyParam ? companyParam.toUpperCase() : 'MANUFACTURER');
+      const sendLabel = 'SEND TO ' + (companyParam ? `<b>${companyParam.toUpperCase()}</b>` : 'MANUFACTURER');
       const sendTitle = 'send paths directly to' + (companyParam ? ' ' + companyParam : ' the manufacturer');
       sendBtn.title = sendTitle;
+      sendBtn.innerHTML = sendLabel;
       downloadBtn.parentNode.insertBefore(sendBtn, downloadBtn.nextSibling);
       sendBtn.addEventListener('click', () => {
-        const original = sendBtn.textContent;
+        const original = sendBtn.innerHTML;
         sendSVGs(emailParam).then(() => {
           sendBtn.textContent = 'SEND SUCCESSFULLY';
-          setTimeout(() => { sendBtn.textContent = original; }, 3000);
+          setTimeout(() => { sendBtn.innerHTML = original; }, 3000);
         }).catch(() => {});
       });
       const infoCell = document.getElementById('downloadInfoText');
