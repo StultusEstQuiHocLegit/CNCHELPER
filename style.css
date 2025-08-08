@@ -233,8 +233,8 @@ button.active {
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
+  /* Dark translucent background so underlying content is still visible */
+  background: rgba(0, 0, 0, 0.7);
   z-index: 9999;
 }
 
