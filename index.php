@@ -84,12 +84,12 @@
       <h1>TRAMANN CNC HELPER</h1>
       <table>
         <tr>
-          <td>here you can add texts, images and common forms to the canvas</td>
-          <td id="downloadInfoText">download the SVG paths for CNC engraving and cutting</td>
+          <td><b>↖</b> there you can add texts, images and common forms to the canvas</td>
+          <td id="downloadInfoText"><b>↗</b> download the SVG paths for CNC engraving and cutting</td>
         </tr>
         <tr>
-          <td>change measurement system and you can take measurements</td>
-          <td>adjust the width and height of your workpiece</td>
+          <td><b>↙</b> change measurement system and you can take measurements</td>
+          <td><b>↘</b> adjust the width and height of your workpiece</td>
         </tr>
       </table>
       <p class="hover-hint">(by hovering with your mouse, you can see explanations and help)</p>
