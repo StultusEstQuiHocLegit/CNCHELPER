@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRAMANN PROJECTS CNCHELPER</title>
+  <title>TRAMANN CNC HELPER</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
   <div id="topBar">
     <div class="toolbar-left">
       <button id="addTextBtn" title="add text">ADD TEXT</button>
-      <button id="uploadBtn" title="upload image">UPLOAD IMAGE</button>
+      <button id="uploadBtn" title="upload image">UPLOAD SVG</button>
       <button id="addFormBtn" title="add a shape/form">ADD FORM</button>
     </div>
     <div class="toolbar-right">
@@ -81,7 +81,7 @@
   <!-- Info overlay shown on first load -->
   <div id="infoOverlay">
     <div id="infoBox">
-      <h1>TRAMANN PROJECTS CNC HELPER</h1>
+      <h1>TRAMANN CNC HELPER</h1>
       <table>
         <tr>
           <td>here you can add texts, images and common forms to the canvas</td>
