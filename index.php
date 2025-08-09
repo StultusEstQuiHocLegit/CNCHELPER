@@ -57,12 +57,12 @@
 
   <!-- Cut/engrave toggle icon (drill icon placeholder) -->
   <div id="cutToggle" class="popover hidden">
-    <button id="cutToggleBtn" title="toggle between engraving (black) and cutting (orange)">TOGGLE CUT</button>
+    <button id="cutToggleBtn" title="toggle between engraving (black) and cutting (orange)">CUTTING</button>
   </div>
 
   <!-- Fill toggle: switch between outline and filled shape -->
   <div id="fillToggle" class="popover hidden">
-    <button id="fillToggleBtn" title="toggle between filled and outline shape">TOGGLE FILL</button>
+    <button id="fillToggleBtn" title="toggle between filled and outline shape">FILL</button>
   </div>
 
   <!-- Form selection menu: appears when Add Form is clicked -->
