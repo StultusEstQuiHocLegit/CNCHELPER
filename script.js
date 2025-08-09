@@ -36,6 +36,7 @@
   let transformTimer = null;
   let transformDone = false;
   let customCreateTimer = null; // timer for custom form creation indicator
+  let clipboard = null; // store copied object for paste
 
   // List of fonts to display in the dropdown. These are common fonts
   // available on most systems. If a font is not installed on the user’s
@@ -1587,6 +1588,40 @@
       e.preventDefault();
       // Trigger download asynchronously and suppress any errors
       downloadSVGs().catch(() => {});
+      return;
+    }
+    // Copy: Ctrl+C
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+      e.preventDefault();
+      const active = canvas.getActiveObject();
+      if (active) {
+        active.clone(cloned => {
+          clipboard = cloned;
+        });
+      }
+      return;
+    }
+    // Paste: Ctrl+V
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+      e.preventDefault();
+      if (clipboard) {
+        clipboard.clone(clonedObj => {
+          const offset = clipboard.getScaledWidth() * 1.1;
+          clonedObj.set({
+            left: clipboard.left + offset,
+            top: clipboard.top
+          });
+          canvas.add(clonedObj);
+          canvas.setActiveObject(clonedObj);
+          canvas.requestRenderAll();
+          markUnsaved();
+          saveHistory();
+          if (gridLines && gridLines.length) {
+            canvas.sendToBack(...gridLines);
+          }
+          clipboard = clonedObj;
+        });
+      }
       return;
     }
     // Delete or backspace to remove object
