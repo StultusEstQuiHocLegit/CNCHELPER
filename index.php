@@ -11,8 +11,8 @@
   <div id="topBar">
     <div class="toolbar-left">
       <button id="addTextBtn" title="add text">ADD TEXT</button>
-      <button id="uploadBtn" title="upload image">UPLOAD IMAGE</button>
-      <button id="addFormBtn" title="add a shape/form">ADD FORM</button>
+      <button id="uploadBtn" title="upload image, SVG works best, other images such as PNG, JPG and JPEG will be transformed first">UPLOAD IMAGE</button>
+      <button id="addFormBtn" title="add a shape/form out of our given examples or create your own ideas">ADD FORM</button>
     </div>
     <div class="toolbar-right">
       <button id="downloadBtn" title="download paths">DOWNLOAD</button>
@@ -51,7 +51,7 @@
 
   <!-- Font selection dropdown (hidden by default) -->
   <div id="fontSelector" class="popover hidden">
-    <label>Choose font:</label>
+    <label>choose font:</label>
     <select id="fontDropdown" title="select a font for the selected text"></select>
   </div>
 
@@ -117,6 +117,8 @@
           </td>
         </tr>
       </table>
+      <p style="opacity:0.5;">(Or instead of transforming, directly upload a SVG file.)</p>
+      <br>
       <div class="transform-buttons">
         <button id="transformCancelBtn" style="opacity:0.5;" title="cancel transformation and go back to canvas">CANCEL</button>
         <button id="transformRetryBtn" class="hidden" style="opacity:0.8;" title="retry transforming the image to SVG">RETRY</button>
