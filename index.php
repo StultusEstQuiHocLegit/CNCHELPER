@@ -36,16 +36,16 @@
   <div id="bottomBar">
     <div class="bottom-left">
       <!-- Unit toggle: simple clickable text. Shows current unit (mm or inch) and toggles on click -->
-      <span id="unitToggle" class="unit-toggle" title="toggle between millimetres and inches">mm</span>
+      <span id="unitToggle" class="unit-toggle" title="toggle between millimetres and inches">MM</span>
       <button id="measureBtn" title="measure distances">MEASURE</button>
     </div>
     <div class="bottom-right">
       <label for="widthInput" title="work area width" style="margin-right:4px;">W:</label>
       <input type="number" id="widthInput" min="0" step="0.01" title="set the width of the work area" style="width:70px;">
-      <span id="widthUnitLabel" title="current unit (mm/inch)" style="margin-right:12px;">mm</span>
+      <span id="widthUnitLabel" title="current unit (mm/inch)" style="margin-right:12px;">MM</span>
       <label for="heightInput" title="work area height" style="margin-right:4px;">H:</label>
       <input type="number" id="heightInput" min="0" step="0.01" title="set the height of the work area" style="width:70px;">
-      <span id="heightUnitLabel" title="current unit (mm/inch)">mm</span>
+      <span id="heightUnitLabel" title="current unit (mm/inch)">MM</span>
     </div>
   </div>
 
