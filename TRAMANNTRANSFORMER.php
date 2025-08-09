@@ -10,11 +10,11 @@ if (!$input || empty($input['image'])) {
 
 $apiKey = 'YOUR_OPENAI_API_KEY'; // placeholder API key
 
-$systemPrompt = <<<'EOD'
+$systemPromptImage = <<<'EOD'
 You are a vectorization engine for CNC engraving/cutting prep.
 
 GOAL
-- Convert the provided image (PNG/JPG/JPEG/SVG/…) into a **single, clean, black-and-white SVG** suitable for CNC engraving/cutting.
+- Convert the provided image (PNG/JPG/JPEG/SVG/…) into a **single, clean, black SVG** suitable for CNC engraving/cutting.
 - Keep **only the main foreground subject** (e.g., if it’s a chicken in front of a wall, output only the chicken).
 - **Nothing should be cropped or missing**: include the full subject; if edges are clipped in the source, infer a plausible full silhouette.
 - Output must be **simple, durable geometry** that machines cleanly.
@@ -28,9 +28,8 @@ STRICT OUTPUT FORMAT
 - Prefer a **single merged silhouette** plus a minimal set of interior paths.
 
 COLOR / FILL / STROKE
-- Use **pure black `#000000`** for material to engrave/remove and shapes that should appear.
-- Use **pure white `#FFFFFF`** for holes/negative spaces.
-- Background should be effectively white (i.e., areas with no black fill).
+- Use **pure black `#000000`**.
+- Background should be effectively empty (i.e., areas with no black fill).
 - Avoid semi-transparency/opacity; use **opacity=1** only.
 - If strokes are necessary, use **round joins and round caps** to avoid burrs.
 - Ensure **minimum stroke width** ≥ **0.5 mm** at the default viewBox scaling, and ensure **minimum gap between distinct edges** ≥ **0.6 mm** to prevent over-burn/merge. If needed, **thicken or remove** overly fine details.
@@ -60,26 +59,75 @@ VALIDATION CHECKS (before returning)
 - The subject is fully inside the viewBox with margin; nothing important is cut off.
 
 RETURN
-- Return **only** the final `<svg>…</svg>` markup that meets the above constraints.
+- Return **only** the final `<svg>...</svg>` markup that meets the above constraints.
 EOD;
 
-$payload = [
-    'model' => 'gpt-4.1-mini',
-    'input' => [
-        [
-            'role' => 'system',
-            'content' => $systemPrompt
-        ],
-        [
-            'role' => 'user',
-            'content' => [
-                ['type' => 'input_text', 'text' => 'Convert this image to an SVG.'],
-                ['type' => 'input_image', 'image_url' => $input['image']]
+$systemPromptText = <<<'EOD'
+You are an SVG path designer for CNC engraving/cutting prep.
+
+GOAL
+- Create a **single, clean, black SVG** representing the user’s idea described in text.
+- Focus on the main subject only; avoid background or extra details.
+- Output must be **simple, durable geometry** that machines cleanly.
+
+STRICT OUTPUT FORMAT
+- **Return ONLY valid `<svg>` markup**. No explanations, comments, Doctype, or XML prolog.
+- One `<svg>` root with a `viewBox` (e.g., `viewBox="0 0 1000 1000"`). Omit width/height so it’s scalable.
+- Use only `<path>`, `<rect>`, `<circle>`, `<ellipse>`, `<line>`, `<polyline>`, `<polygon>`.
+- Use **absolute coordinates** and resolve transforms.
+- Prefer a **single merged silhouette** plus minimal interior paths.
+
+COLOR / FILL / STROKE
+- Use **pure black `#000000`**.
+- Avoid semi-transparency/opacity; use **opacity=1** only.
+- If strokes are necessary, use **round joins and round caps**.
+
+SIMPLIFICATION & CLEANUP
+- Keep geometry simple; remove tiny details that won’t machine well.
+- No overlapping duplicate paths, self-intersections, or open contours unless intentionally strokes.
+- Preserve aspect ratio of the subject and include a small margin.
+
+RETURN
+- Return **only** the final `<svg>...</svg>` markup that meets the above constraints.
+EOD;
+
+
+if (!empty($input['image'])) {
+    $payload = [
+        'model' => 'gpt-4.1-mini',
+        'input' => [
+            [
+                'role' => 'system',
+                'content' => $systemPromptImage
+            ],
+            [
+                'role' => 'user',
+                'content' => [
+                    ['type' => 'input_text', 'text' => 'Convert this image to an SVG.'],
+                    ['type' => 'input_image', 'image_url' => $input['image']]
+                ]
             ]
-        ]
-    ],
-    'max_output_tokens' => 4096
-];
+        ],
+        'max_output_tokens' => 4096
+    ];
+} else {
+    $payload = [
+        'model' => 'gpt-4.1-mini',
+        'input' => [
+            [
+                'role' => 'system',
+                'content' => $systemPromptText
+            ],
+            [
+                'role' => 'user',
+                'content' => [
+                    ['type' => 'input_text', 'text' => $input['prompt']]
+                ]
+            ]
+        ],
+        'max_output_tokens' => 4096
+    ];
+}
 
 $ch = curl_init('https://api.openai.com/v1/responses');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
