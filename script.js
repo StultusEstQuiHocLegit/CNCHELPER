@@ -463,14 +463,14 @@
 
     // Set unit toggle text and click handler (simple toggle between mm and inch)
     const unitToggleEl = document.getElementById('unitToggle');
-    unitToggleEl.textContent = unit;
+    unitToggleEl.textContent = unit.toUpperCase();
     unitToggleEl.addEventListener('click', () => {
       // Exit measurement mode and hide popovers when changing units
       stopMeasurement();
       hidePopovers();
       canvas.discardActiveObject();
       unit = unit === 'mm' ? 'inch' : 'mm';
-      unitToggleEl.textContent = unit;
+      unitToggleEl.textContent = unit.toUpperCase();
       savePref('cnc_unit', unit);
       updateDimensionInputs();
       drawGrid();
@@ -906,8 +906,8 @@
   function updateUnitLabels() {
     const widthUnitLabel = document.getElementById('widthUnitLabel');
     const heightUnitLabel = document.getElementById('heightUnitLabel');
-    widthUnitLabel.textContent = unit;
-    heightUnitLabel.textContent = unit;
+    widthUnitLabel.textContent = unit.toUpperCase();
+    heightUnitLabel.textContent = unit.toUpperCase();
   }
 
   // Convert mm to pixels at the current zoom level
