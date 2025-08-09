@@ -2224,6 +2224,7 @@
     createBtn.textContent = 'CREATE';
     createBtn.title = 'create paths';
     createBtn.classList.add('create-btn');
+    createBtn.type = 'button';
     createBtn.style.display = 'none';
     menuEl.appendChild(createBtn);
 
@@ -2238,7 +2239,15 @@
       }
     });
 
-    createBtn.addEventListener('click', () => {
+    ta.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        createBtn.click();
+      }
+    });
+
+    createBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       const prompt = ta.value.trim();
       if (!prompt) return;
       const original = prompt;
