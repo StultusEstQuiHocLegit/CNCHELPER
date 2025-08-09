@@ -113,9 +113,9 @@
         </tr>
       </table>
       <div class="transform-buttons">
-        <button id="transformCancelBtn" style="opacity:0.5;">CANCEL</button>
-        <button id="transformRetryBtn" style="opacity:0.8;">RETRY</button>
-        <button id="transformAcceptBtn" style="opacity:1;">ACCEPT</button>
+        <button id="transformCancelBtn" style="opacity:0.5;" title="cancel transformation and go back to canvas">CANCEL</button>
+        <button id="transformRetryBtn" class="hidden" style="opacity:0.8;" title="retry transforming the image to SVG">RETRY</button>
+        <button id="transformAcceptBtn" class="hidden" style="opacity:1;" title="accept and add to canvas">ACCEPT</button>
       </div>
     </div>
   </div>
