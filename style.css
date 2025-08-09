@@ -199,9 +199,13 @@ button.active {
   min-width: 260px;
 }
 
-/* cut toggle icon button */
-#cutToggleBtn {
+/* cut toggle icon button and remove button */
+#cutToggleBtn, #removeBtn {
   font-size: 12px;
+}
+
+#removeBtn {
+  font-weight: bold;
 }
 
 /* Form menu layout */

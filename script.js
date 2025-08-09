@@ -843,6 +843,19 @@
       hidePopovers();
     });
 
+    document.getElementById('removeBtn').addEventListener('click', () => {
+      const objs = canvas.getActiveObjects();
+      if (!objs || objs.length === 0) return;
+      if (confirm('Do you really want to remove this from the canvas?')) {
+        objs.forEach(obj => canvas.remove(obj));
+        canvas.discardActiveObject();
+        canvas.requestRenderAll();
+        markUnsaved();
+        saveHistory();
+        hidePopovers();
+      }
+    });
+
     // Setup beforeunload to warn unsaved changes
     window.addEventListener('beforeunload', function(e) {
       if (hasUnsavedChanges && canvas.getObjects().filter(obj => !obj.isGrid).length > 0) {
@@ -1301,11 +1314,13 @@
     } else {
       fontSelector.classList.add('hidden');
     }
-    // Always show cut toggle and layer controls for selected objects
+    // Always show cut toggle, layer controls, and remove button for selected objects
     const cutToggle = document.getElementById('cutToggle');
     const layerControls = document.getElementById('layerControls');
+    const removeControl = document.getElementById('removeControl');
     cutToggle.classList.remove('hidden');
     layerControls.classList.remove('hidden');
+    removeControl.classList.remove('hidden');
     // Determine if fill toggle should be visible: it applies to shapes
     const fillToggle = document.getElementById('fillToggle');
     function supportsFill(target) {
@@ -1336,6 +1351,7 @@
     const cutRect = cutToggle.getBoundingClientRect();
     const fillRect = fillToggle.getBoundingClientRect();
     const layerRect = layerControls.getBoundingClientRect();
+    const removeRect = removeControl.getBoundingClientRect();
     const margin = 8;
     // Calculate total width based on which popovers are visible
     let totalWidth = 0;
@@ -1355,6 +1371,9 @@
     }
     // Layer controls always visible
     totalWidth += layerRect.width;
+    visibleCount++;
+    // Remove control always visible
+    totalWidth += removeRect.width;
     visibleCount++;
     // Add margins between visible elements
     totalWidth += margin * (visibleCount - 1);
@@ -1380,6 +1399,11 @@
     // Position layer controls
     layerControls.style.left = left + 'px';
     layerControls.style.top = popoverTop + 'px';
+    left += layerRect.width + margin;
+
+    // Position remove control
+    removeControl.style.left = left + 'px';
+    removeControl.style.top = popoverTop + 'px';
   }
 
   // Hide both popovers
@@ -1388,6 +1412,7 @@
     document.getElementById('cutToggle').classList.add('hidden');
     document.getElementById('layerControls').classList.add('hidden');
     document.getElementById('fillToggle').classList.add('hidden');
+    document.getElementById('removeControl').classList.add('hidden');
   }
 
   // Toggle cut/engrave color on selected objects

@@ -78,6 +78,11 @@
     <button id="bringToFrontBtn" title="bring to front">»</button>
   </div>
 
+  <!-- Remove control popover: delete selected object(s) -->
+  <div id="removeControl" class="popover hidden">
+    <button id="removeBtn" title="remove"><b>X</b></button>
+  </div>
+
   <!-- Info overlay shown on first load -->
   <div id="infoOverlay">
     <div id="infoBox">
