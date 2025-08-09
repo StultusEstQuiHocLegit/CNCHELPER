@@ -1584,14 +1584,14 @@
       return;
     }
     // Ctrl+S (save/download)
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+    if ((e.ctrlKey || e.metaKey) && ((e.key && e.key.toLowerCase() === 's') || e.code === 'KeyS')) {
       e.preventDefault();
       // Trigger download asynchronously and suppress any errors
       downloadSVGs().catch(() => {});
       return;
     }
     // Copy: Ctrl+C
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+    if ((e.ctrlKey || e.metaKey) && ((e.key && e.key.toLowerCase() === 'c') || e.code === 'KeyC')) {
       e.preventDefault();
       const active = canvas.getActiveObject();
       if (active) {
@@ -1602,7 +1602,7 @@
       return;
     }
     // Paste: Ctrl+V
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+    if ((e.ctrlKey || e.metaKey) && ((e.key && e.key.toLowerCase() === 'v') || e.code === 'KeyV')) {
       e.preventDefault();
       if (clipboard) {
         clipboard.clone(clonedObj => {
