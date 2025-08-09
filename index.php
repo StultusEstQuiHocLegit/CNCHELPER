@@ -97,9 +97,32 @@
     </div>
   </div>
 
+  <!-- Transformation overlay for non-SVG uploads -->
+  <div id="transformOverlay">
+    <div id="transformBox">
+      <h1>TRAMANN TRANSFORMER</h1>
+      <table>
+        <tr>
+          <td><img id="transformInputPreview" src="" alt="input preview"></td>
+          <td class="transform-arrow"><b>&rarr;</b></td>
+          <td>
+            <div id="transformOutputPreview">
+              <div class="orbit-dot"></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div class="transform-buttons">
+        <button id="transformCancelBtn" style="opacity:0.5;">CANCEL</button>
+        <button id="transformRetryBtn" style="opacity:0.8;">RETRY</button>
+        <button id="transformAcceptBtn" style="opacity:1;">ACCEPT</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Libraries -->
   <script src="fabric.min.js"></script>
   <script src="imagetracer.js"></script>
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

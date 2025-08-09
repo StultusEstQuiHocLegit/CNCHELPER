@@ -30,6 +30,11 @@
   // Track whether an object is currently being transformed (move/scale/rotate)
   let isTransforming = false;
 
+  // Data for transformation overlay
+  let pendingImageData = null;
+  let transformTimer = null;
+  let transformDone = false;
+
   // List of fonts to display in the dropdown. These are common fonts
   // available on most systems. If a font is not installed on the user’s
   // system it will fall back to the default sans-serif font.
@@ -710,6 +715,80 @@
       });
     }
     document.getElementById('fileInput').addEventListener('change', handleFileInput);
+
+    // Transformation overlay buttons
+    const tCancel = document.getElementById('transformCancelBtn');
+    const tRetry = document.getElementById('transformRetryBtn');
+    const tAccept = document.getElementById('transformAcceptBtn');
+    if (tCancel && tRetry && tAccept) {
+      tCancel.addEventListener('click', () => {
+        const overlay = document.getElementById('transformOverlay');
+        overlay.style.display = 'none';
+        if (transformTimer) clearTimeout(transformTimer);
+      });
+      tRetry.addEventListener('click', () => {
+        if (pendingImageData) startTransformSimulation(pendingImageData);
+      });
+      tAccept.addEventListener('click', () => {
+        if (!pendingImageData) return;
+        const overlay = document.getElementById('transformOverlay');
+        overlay.style.display = 'none';
+        if (transformTimer) clearTimeout(transformTimer);
+        const dataURL = pendingImageData;
+        const options = {
+          corsenabled: true,
+          colorsampling: 0,
+          numberofcolors: 2,
+          mincolorratio: 0,
+          colorquantcycles: 3,
+          layering: 0,
+          strokewidth: 0,
+          linefilter: false,
+          roundcoords: 1,
+          desc: false,
+          viewbox: false,
+          blurradius: 0,
+          blurdelta: 20,
+          pal: [[0, 0, 0], [255, 255, 255]]
+        };
+        ImageTracer.imageToSVG(dataURL, function(svgString) {
+          fabric.loadSVGFromString(svgString, (objects, options) => {
+            const group = fabric.util.groupSVGElements(objects, options);
+            const center = getVisibleCenter();
+            const vpt = canvas.viewportTransform;
+            const inv = fabric.util.invertTransform(vpt);
+            const dpr = window.devicePixelRatio || 1;
+            const tl = fabric.util.transformPoint(new fabric.Point(0, 0), inv);
+            const br = fabric.util.transformPoint(new fabric.Point(canvas.getWidth() * dpr, canvas.getHeight() * dpr), inv);
+            let visibleWidth = br.x - tl.x;
+            let visibleHeight = br.y - tl.y;
+            if (visibleWidth > workWidth) visibleWidth = workWidth;
+            if (visibleHeight > workHeight) visibleHeight = workHeight;
+            const limitWidth = visibleWidth * 0.5;
+            const limitHeight = visibleHeight * 0.5;
+            const gW = group.width || 1;
+            const gH = group.height || 1;
+            const scaleFactor = Math.min(limitWidth / gW, limitHeight / gH, 1);
+            group.set({
+              scaleX: scaleFactor,
+              scaleY: scaleFactor,
+              left: 0,
+              top: 0,
+              originX: 'left',
+              originY: 'top',
+              fill: '#000000',
+              operation: 'engrave'
+            });
+            canvas.add(group);
+            canvas.setActiveObject(group);
+            canvas.requestRenderAll();
+            markUnsaved();
+            saveHistory();
+          });
+        }, options);
+      });
+    }
+
     document.getElementById('cutToggleBtn').addEventListener('click', () => {
       toggleCutColor();
     });
@@ -1101,121 +1180,87 @@
   function handleFileInput(e) {
     // Exit measurement mode when uploading images
     stopMeasurement();
-    const files = e.target.files;
-    if (!files) return;
-    [...files].forEach(file => {
-      const reader = new FileReader();
-      const ext = file.name.split('.').pop().toLowerCase();
-      if (ext === 'svg') {
-        reader.onload = function(evt) {
-          const svgString = evt.target.result;
-          fabric.loadSVGFromString(svgString, (objects, options) => {
-            const group = fabric.util.groupSVGElements(objects, options);
-            // Compute centre of visible area and clamp to work area
-            const center = getVisibleCenter();
-            // Determine visible viewport size using the inverse viewport transform
-            const vpt = canvas.viewportTransform;
-            const inv = fabric.util.invertTransform(vpt);
-            // Account for device pixel ratio when computing visible world bounds
-            const ratio = window.devicePixelRatio || 1;
-            const tl = fabric.util.transformPoint(new fabric.Point(0, 0), inv);
-            const br = fabric.util.transformPoint(new fabric.Point(canvas.getWidth() * ratio, canvas.getHeight() * ratio), inv);
-            let visibleWidth = br.x - tl.x;
-            let visibleHeight = br.y - tl.y;
-            // Clamp visible size to work area (to avoid extremely large numbers when panned off the plate)
-            if (visibleWidth > workWidth) visibleWidth = workWidth;
-            if (visibleHeight > workHeight) visibleHeight = workHeight;
-            const limitWidth = visibleWidth * 0.5;
-            const limitHeight = visibleHeight * 0.5;
-            const gW = group.width || 1;
-            const gH = group.height || 1;
-            const scaleFactor = Math.min(limitWidth / gW, limitHeight / gH, 1);
-            group.set({
-              scaleX: scaleFactor,
-              scaleY: scaleFactor,
-              // Place at top-left corner
-              left: 0,
-              top: 0,
-              originX: 'left',
-              originY: 'top',
-              fill: '#000000',
-              operation: 'engrave'
-            });
-            canvas.add(group);
-            canvas.setActiveObject(group);
-            canvas.requestRenderAll();
-            markUnsaved();
-            saveHistory();
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext === 'svg') {
+      reader.onload = function(evt) {
+        const svgString = evt.target.result;
+        fabric.loadSVGFromString(svgString, (objects, options) => {
+          const group = fabric.util.groupSVGElements(objects, options);
+          const center = getVisibleCenter();
+          const vpt = canvas.viewportTransform;
+          const inv = fabric.util.invertTransform(vpt);
+          const ratio = window.devicePixelRatio || 1;
+          const tl = fabric.util.transformPoint(new fabric.Point(0, 0), inv);
+          const br = fabric.util.transformPoint(new fabric.Point(canvas.getWidth() * ratio, canvas.getHeight() * ratio), inv);
+          let visibleWidth = br.x - tl.x;
+          let visibleHeight = br.y - tl.y;
+          if (visibleWidth > workWidth) visibleWidth = workWidth;
+          if (visibleHeight > workHeight) visibleHeight = workHeight;
+          const limitWidth = visibleWidth * 0.5;
+          const limitHeight = visibleHeight * 0.5;
+          const gW = group.width || 1;
+          const gH = group.height || 1;
+          const scaleFactor = Math.min(limitWidth / gW, limitHeight / gH, 1);
+          group.set({
+            scaleX: scaleFactor,
+            scaleY: scaleFactor,
+            left: 0,
+            top: 0,
+            originX: 'left',
+            originY: 'top',
+            fill: '#000000',
+            operation: 'engrave'
           });
-        };
-        reader.readAsText(file);
-      } else {
-        // Raster image: convert to SVG using ImageTracer
-        reader.onload = function(evt) {
-          const dataURL = evt.target.result;
-          // Options for ImageTracer: 2 colors (black and white)
-          const options = {
-            corsenabled: true,
-            colorsampling: 0,
-            numberofcolors: 2,
-            mincolorratio: 0,
-            colorquantcycles: 3,
-            layering: 0,
-            strokewidth: 0,
-            linefilter: false,
-            roundcoords: 1,
-            desc: false,
-            viewbox: false,
-            blurradius: 0,
-            blurdelta: 20,
-            pal: [[0, 0, 0], [255, 255, 255]]
-          };
-            ImageTracer.imageToSVG(dataURL, function(svgString) {
-            fabric.loadSVGFromString(svgString, (objects, options) => {
-              const group = fabric.util.groupSVGElements(objects, options);
-              // Compute centre of visible area and clamp to work area
-              const center = getVisibleCenter();
-              // Determine visible viewport size using inverse viewport transform
-              const vpt = canvas.viewportTransform;
-              const inv = fabric.util.invertTransform(vpt);
-              const dpr = window.devicePixelRatio || 1;
-              const tl = fabric.util.transformPoint(new fabric.Point(0, 0), inv);
-              const br = fabric.util.transformPoint(new fabric.Point(canvas.getWidth() * dpr, canvas.getHeight() * dpr), inv);
-              let visibleWidth = br.x - tl.x;
-              let visibleHeight = br.y - tl.y;
-              if (visibleWidth > workWidth) visibleWidth = workWidth;
-              if (visibleHeight > workHeight) visibleHeight = workHeight;
-              const limitWidth = visibleWidth * 0.5;
-              const limitHeight = visibleHeight * 0.5;
-              const gW = group.width || 1;
-              const gH = group.height || 1;
-              const scaleFactor = Math.min(limitWidth / gW, limitHeight / gH, 1);
-              group.set({
-                scaleX: scaleFactor,
-                scaleY: scaleFactor,
-                // Place at top-left corner
-                left: 0,
-                top: 0,
-                originX: 'left',
-                originY: 'top',
-                fill: '#000000',
-                operation: 'engrave'
-              });
-              canvas.add(group);
-              canvas.setActiveObject(group);
-              canvas.requestRenderAll();
-              markUnsaved();
-              saveHistory();
-            });
-          }, options);
-        };
-        if (ext === 'png' || ext === 'jpeg' || ext === 'jpg' || ext === 'bmp') {
-          reader.readAsDataURL(file);
-        }
+          canvas.add(group);
+          canvas.setActiveObject(group);
+          canvas.requestRenderAll();
+          markUnsaved();
+          saveHistory();
+        });
+      };
+      reader.readAsText(file);
+    } else {
+      reader.onload = function(evt) {
+        pendingImageData = evt.target.result;
+        showTransformOverlay(pendingImageData);
+      };
+      if (ext === 'png' || ext === 'jpeg' || ext === 'jpg' || ext === 'bmp') {
+        reader.readAsDataURL(file);
       }
-    });
+    }
     // reset file input so same file can be uploaded again
     e.target.value = '';
+  }
+
+  // Display transformation overlay and simulate processing
+  function showTransformOverlay(dataURL) {
+    const overlay = document.getElementById('transformOverlay');
+    const inputPreview = document.getElementById('transformInputPreview');
+    if (!overlay || !inputPreview) return;
+    inputPreview.src = dataURL;
+    overlay.style.display = 'flex';
+    startTransformSimulation(dataURL);
+  }
+
+  function startTransformSimulation(dataURL) {
+    transformDone = false;
+    const output = document.getElementById('transformOutputPreview');
+    if (!output) return;
+    output.innerHTML = '';
+    const dot = document.createElement('div');
+    dot.className = 'orbit-dot';
+    output.appendChild(dot);
+    if (transformTimer) clearTimeout(transformTimer);
+    transformTimer = setTimeout(() => {
+      output.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = dataURL;
+      output.appendChild(img);
+      transformDone = true;
+    }, 3000);
   }
 
   // Handle selection events to show popovers
