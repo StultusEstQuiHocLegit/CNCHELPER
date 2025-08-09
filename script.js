@@ -35,6 +35,7 @@
   let pendingSvgData = null;
   let transformTimer = null;
   let transformDone = false;
+  let customCreateTimer = null; // timer for custom form creation indicator
 
   // List of fonts to display in the dropdown. These are common fonts
   // available on most systems. If a font is not installed on the user’s
@@ -634,6 +635,7 @@
           buildFormMenu(menu);
           menu.dataset.built = 'true';
         }
+        resetCustomFormInput();
         // Position the menu below the button
         const btnRect = btn.getBoundingClientRect();
         menu.style.left = btnRect.left + 'px';
@@ -645,6 +647,7 @@
         // Hide menu and remove active state
         menu.classList.add('hidden');
         btn.classList.remove('active');
+        resetCustomFormInput();
       }
     });
     // Hide form menu when clicking outside
@@ -660,6 +663,7 @@
       menu.classList.add('hidden');
       // remove active state from button when menu closes
       btn.classList.remove('active');
+      resetCustomFormInput();
     });
 
     // Handle email/company URL parameters
@@ -2189,13 +2193,100 @@
         insertShape(key);
         // Hide the menu and remove active state from the Add Form button
         const menu = document.getElementById('formMenu');
-        if (menu) menu.classList.add('hidden');
+        if (menu) {
+          menu.classList.add('hidden');
+          resetCustomFormInput();
+        }
         const formBtn = document.getElementById('addFormBtn');
         if (formBtn) formBtn.classList.remove('active');
         // Stop measurement mode if active when inserting a shape
         stopMeasurement();
       });
       menuEl.appendChild(btn);
+    });
+
+    // spacer line
+    const spacer = document.createElement('div');
+    spacer.style.flexBasis = '100%';
+    spacer.style.height = '0';
+    menuEl.appendChild(spacer);
+
+    // textarea for custom idea
+    const ta = document.createElement('textarea');
+    ta.id = 'customFormInput';
+    ta.rows = 1;
+    ta.placeholder = '... or enter your own idea';
+    ta.style.flexBasis = '100%';
+    menuEl.appendChild(ta);
+
+    const createBtn = document.createElement('button');
+    createBtn.id = 'customFormCreateBtn';
+    createBtn.textContent = 'CREATE';
+    createBtn.title = 'create paths';
+    createBtn.classList.add('create-btn');
+    createBtn.style.display = 'none';
+    menuEl.appendChild(createBtn);
+
+    ta.addEventListener('focus', () => { ta.rows = 3; });
+    ta.addEventListener('blur', () => { ta.rows = 1; });
+    ta.addEventListener('input', () => {
+      if (ta.value.trim()) {
+        createBtn.style.display = 'block';
+      } else {
+        createBtn.style.display = 'none';
+        createBtn.textContent = 'CREATE';
+      }
+    });
+
+    createBtn.addEventListener('click', () => {
+      const prompt = ta.value.trim();
+      if (!prompt) return;
+      const original = prompt;
+      ta.readOnly = true;
+      ta.blur();
+      createBtn.disabled = true;
+      let dots = 0;
+      ta.value = 'creating';
+      customCreateTimer = setInterval(() => {
+        dots = (dots + 1) % 4;
+        ta.value = 'creating' + (dots ? ' ' + '. '.repeat(dots).trim() : '');
+      }, 500);
+      fetch('TRAMANNTRANSFORMER.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then(data => {
+        clearInterval(customCreateTimer);
+        customCreateTimer = null;
+        ta.readOnly = false;
+        createBtn.disabled = false;
+        if (data.svg) {
+          addSVGToCanvas(data.svg);
+          resetCustomFormInput();
+          const menu = document.getElementById('formMenu');
+          const btn = document.getElementById('addFormBtn');
+          if (menu) menu.classList.add('hidden');
+          if (btn) btn.classList.remove('active');
+        } else {
+          console.error('Transformer error:', data.error || 'No SVG returned');
+          ta.value = original;
+          createBtn.textContent = 'RETRY';
+        }
+      })
+      .catch(err => {
+        clearInterval(customCreateTimer);
+        customCreateTimer = null;
+        ta.readOnly = false;
+        createBtn.disabled = false;
+        ta.value = original;
+        createBtn.textContent = 'RETRY';
+        console.error('Transformer fetch error:', err);
+      });
     });
   }
 
@@ -2225,8 +2316,76 @@
     // Close the form menu after inserting a shape and reset the Add Form button
     const menu = document.getElementById('formMenu');
     const formBtn = document.getElementById('addFormBtn');
-    if (menu) menu.classList.add('hidden');
+    if (menu) {
+      menu.classList.add('hidden');
+      resetCustomFormInput();
+    }
     if (formBtn) formBtn.classList.remove('active');
+  }
+
+  // Add an SVG string to the canvas, scaling to the visible area
+  function addSVGToCanvas(svgString) {
+    fabric.loadSVGFromString(svgString, (objects, options) => {
+      const group = fabric.util.groupSVGElements(objects, options);
+      // ensure operation and color
+      function applyOperation(obj) {
+        if (obj._objects && Array.isArray(obj._objects)) {
+          obj._objects.forEach(child => applyOperation(child));
+        }
+        obj.operation = 'engrave';
+        if (obj.fill && obj.fill !== 'transparent') obj.set('fill', '#000000');
+        if (obj.stroke) obj.set('stroke', '#000000');
+      }
+      applyOperation(group);
+      const center = getVisibleCenter();
+      const vpt = canvas.viewportTransform;
+      const inv = fabric.util.invertTransform(vpt);
+      const dpr = window.devicePixelRatio || 1;
+      const tl = fabric.util.transformPoint(new fabric.Point(0, 0), inv);
+      const br = fabric.util.transformPoint(new fabric.Point(canvas.getWidth() * dpr, canvas.getHeight() * dpr), inv);
+      let visibleWidth = br.x - tl.x;
+      let visibleHeight = br.y - tl.y;
+      if (visibleWidth > workWidth) visibleWidth = workWidth;
+      if (visibleHeight > workHeight) visibleHeight = workHeight;
+      const limitWidth = visibleWidth * 0.5;
+      const limitHeight = visibleHeight * 0.5;
+      const gW = group.width || 1;
+      const gH = group.height || 1;
+      const scaleFactor = Math.min(limitWidth / gW, limitHeight / gH, 1);
+      group.set({
+        scaleX: scaleFactor,
+        scaleY: scaleFactor,
+        left: center.x,
+        top: center.y,
+        originX: 'center',
+        originY: 'center'
+      });
+      canvas.add(group);
+      canvas.setActiveObject(group);
+      canvas.requestRenderAll();
+      markUnsaved();
+      saveHistory();
+    });
+  }
+
+  // Reset custom form textarea and button
+  function resetCustomFormInput() {
+    const ta = document.getElementById('customFormInput');
+    const btn = document.getElementById('customFormCreateBtn');
+    if (customCreateTimer) {
+      clearInterval(customCreateTimer);
+      customCreateTimer = null;
+    }
+    if (ta) {
+      ta.value = '';
+      ta.rows = 1;
+      ta.readOnly = false;
+    }
+    if (btn) {
+      btn.textContent = 'CREATE';
+      btn.disabled = false;
+      btn.style.display = 'none';
+    }
   }
 
   // Save current state to history

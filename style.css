@@ -232,6 +232,22 @@ button.active {
   color: #007bff;
 }
 
+#formMenu textarea {
+  flex-basis: 100%;
+  width: 100%;
+  resize: none;
+  margin-top: 8px;
+  padding: 4px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+#formMenu .create-btn {
+  flex-basis: 100%;
+  display: none;
+  margin: 4px auto 0;
+}
+
 /* Introductory info overlay */
 #infoOverlay {
   position: fixed;
