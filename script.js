@@ -2260,6 +2260,7 @@
     ta.id = 'customFormInput';
     ta.rows = 1;
     ta.placeholder = '... or enter your own idea';
+    ta.dataset.defaultPlaceholder = ta.placeholder;
     ta.style.flexBasis = '100%';
     menuEl.appendChild(ta);
 
@@ -2300,11 +2301,13 @@
       ta.readOnly = true;
       ta.blur();
       createBtn.disabled = true;
+      createBtn.style.display = 'none';
       let dots = 0;
-      ta.value = 'creating';
+      ta.value = '';
+      ta.placeholder = 'creating';
       customCreateTimer = setInterval(() => {
         dots = (dots + 1) % 4;
-        ta.value = 'creating' + (dots ? ' ' + '. '.repeat(dots).trim() : '');
+        ta.placeholder = 'creating' + (dots ? ' ' + '. '.repeat(dots).trim() : '');
       }, 500);
       fetch('TRAMANNTRANSFORMER.php', {
         method: 'POST',
@@ -2320,14 +2323,19 @@
         customCreateTimer = null;
         ta.readOnly = false;
         createBtn.disabled = false;
+        ta.placeholder = ta.dataset.defaultPlaceholder || '';
         if (data.svg) {
           addSVGToCanvas(data.svg);
-          // Keep menu open for creating multiple custom forms
+          const menu = document.getElementById('formMenu');
+          const formBtn = document.getElementById('addFormBtn');
+          if (menu) menu.classList.add('hidden');
+          if (formBtn) formBtn.classList.remove('active');
           resetCustomFormInput();
         } else {
           console.error('Transformer error:', data.error || 'No SVG returned');
           ta.value = original;
           createBtn.textContent = 'RETRY';
+          createBtn.style.display = 'block';
         }
       })
       .catch(err => {
@@ -2335,8 +2343,10 @@
         customCreateTimer = null;
         ta.readOnly = false;
         createBtn.disabled = false;
+        ta.placeholder = ta.dataset.defaultPlaceholder || '';
         ta.value = original;
         createBtn.textContent = 'RETRY';
+        createBtn.style.display = 'block';
         console.error('Transformer fetch error:', err);
       });
     });
@@ -2431,6 +2441,7 @@
       ta.value = '';
       ta.rows = 1;
       ta.readOnly = false;
+      ta.placeholder = ta.dataset.defaultPlaceholder || '... or enter your own idea';
     }
     if (btn) {
       btn.textContent = 'CREATE';
