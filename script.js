@@ -654,10 +654,14 @@
     document.addEventListener('click', (evt) => {
       const menu = document.getElementById('formMenu');
       const btn = document.getElementById('addFormBtn');
-      if (!menu) return;
-      if (menu.classList.contains('hidden')) return;
+      if (!menu || menu.classList.contains('hidden')) return;
       const target = evt.target;
-      if (target === btn || btn.contains(target) || menu.contains(target)) {
+      if (
+        evt.defaultPrevented ||
+        target === btn ||
+        btn.contains(target) ||
+        menu.contains(target)
+      ) {
         return;
       }
       menu.classList.add('hidden');
@@ -2283,6 +2287,7 @@
     createBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       const prompt = ta.value.trim();
       if (!prompt) return;
       const original = prompt;
@@ -2311,11 +2316,8 @@
         createBtn.disabled = false;
         if (data.svg) {
           addSVGToCanvas(data.svg);
+          // Keep menu open for creating multiple custom forms
           resetCustomFormInput();
-          const menu = document.getElementById('formMenu');
-          const btn = document.getElementById('addFormBtn');
-          if (menu) menu.classList.add('hidden');
-          if (btn) btn.classList.remove('active');
         } else {
           console.error('Transformer error:', data.error || 'No SVG returned');
           ta.value = original;
