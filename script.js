@@ -2259,7 +2259,7 @@
     const ta = document.createElement('textarea');
     ta.id = 'customFormInput';
     ta.rows = 1;
-    ta.placeholder = '... or enter your own idea';
+    ta.placeholder = '. . . or enter your own idea and press the enter key on your keyboard to create it';
     ta.dataset.defaultPlaceholder = ta.placeholder;
     ta.style.flexBasis = '100%';
     menuEl.appendChild(ta);
@@ -2275,14 +2275,14 @@
 
     ta.addEventListener('focus', () => { ta.rows = 3; });
     ta.addEventListener('blur', () => { ta.rows = 1; });
-    ta.addEventListener('input', () => {
-      if (ta.value.trim()) {
-        createBtn.style.display = 'block';
-      } else {
-        createBtn.style.display = 'none';
-        createBtn.textContent = 'CREATE';
-      }
-    });
+    // ta.addEventListener('input', () => {
+    //   if (ta.value.trim()) {
+    //     createBtn.style.display = 'block';
+    //   } else {
+    //     createBtn.style.display = 'none';
+    //     createBtn.textContent = 'CREATE';
+    //   }
+    // });
 
     ta.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -2301,7 +2301,7 @@
       ta.readOnly = true;
       ta.blur();
       createBtn.disabled = true;
-      createBtn.style.display = 'none';
+      // createBtn.style.display = 'none';
       let dots = 0;
       ta.value = '';
       ta.placeholder = 'creating';
@@ -2335,7 +2335,7 @@
           console.error('Transformer error:', data.error || 'No SVG returned');
           ta.value = original;
           createBtn.textContent = 'RETRY';
-          createBtn.style.display = 'block';
+          // createBtn.style.display = 'block';
         }
       })
       .catch(err => {
@@ -2346,7 +2346,7 @@
         ta.placeholder = ta.dataset.defaultPlaceholder || '';
         ta.value = original;
         createBtn.textContent = 'RETRY';
-        createBtn.style.display = 'block';
+        // createBtn.style.display = 'block';
         console.error('Transformer fetch error:', err);
       });
     });
