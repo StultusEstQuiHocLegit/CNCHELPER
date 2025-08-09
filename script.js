@@ -2110,17 +2110,51 @@
         originY: 'center'
       });
     },
-    // Cross shape (outline) as an alias for a simple plus sign outline
+    // Cross shape defined as a single polygon so lines don't overlap in the center
     'crossOutline': () => {
-      // Use two rectangles to form a cross
-      const vRect = new fabric.Rect({ width: 20, height: 80, fill: 'transparent', stroke: '#000000', strokeWidth: 1, originX: 'center', originY: 'center' });
-      const hRect = new fabric.Rect({ width: 80, height: 20, fill: 'transparent', stroke: '#000000', strokeWidth: 1, originX: 'center', originY: 'center' });
-      return new fabric.Group([vRect, hRect], { originX: 'center', originY: 'center' });
+      const points = [
+        { x: 10,  y: -40 },
+        { x: -10, y: -40 },
+        { x: -10, y: -10 },
+        { x: -40, y: -10 },
+        { x: -40, y: 10 },
+        { x: -10, y: 10 },
+        { x: -10, y: 40 },
+        { x: 10,  y: 40 },
+        { x: 10,  y: 10 },
+        { x: 40, y: 10 },
+        { x: 40, y: -10 },
+        { x: 10,  y: -10 }
+      ];
+      return new fabric.Polygon(points, {
+        fill: 'transparent',
+        stroke: '#000000',
+        strokeWidth: 1,
+        originX: 'center',
+        originY: 'center'
+      });
     },
     'crossFilled': () => {
-      const vRect = new fabric.Rect({ width: 20, height: 80, fill: '#000000', originX: 'center', originY: 'center' });
-      const hRect = new fabric.Rect({ width: 80, height: 20, fill: '#000000', originX: 'center', originY: 'center' });
-      return new fabric.Group([vRect, hRect], { originX: 'center', originY: 'center' });
+      const points = [
+        { x: 10,  y: -40 },
+        { x: -10, y: -40 },
+        { x: -10, y: -10 },
+        { x: -40, y: -10 },
+        { x: -40, y: 10 },
+        { x: -10, y: 10 },
+        { x: -10, y: 40 },
+        { x: 10,  y: 40 },
+        { x: 10,  y: 10 },
+        { x: 40, y: 10 },
+        { x: 40, y: -10 },
+        { x: 10,  y: -10 }
+      ];
+      return new fabric.Polygon(points, {
+        fill: '#000000',
+        stroke: null,
+        originX: 'center',
+        originY: 'center'
+      });
     }
   };
 
