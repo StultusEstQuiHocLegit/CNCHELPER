@@ -80,7 +80,7 @@
 
   <!-- Remove control popover: delete selected object(s) -->
   <div id="removeControl" class="popover hidden">
-    <button id="removeBtn" title="remove"><b>X</b></button>
+    <button id="removeBtn" title="remove">X</button>
   </div>
 
   <!-- Info overlay shown on first load -->
