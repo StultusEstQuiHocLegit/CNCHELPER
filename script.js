@@ -725,6 +725,8 @@
         const overlay = document.getElementById('transformOverlay');
         overlay.style.display = 'none';
         if (transformTimer) clearTimeout(transformTimer);
+        tRetry.classList.add('hidden');
+        tAccept.classList.add('hidden');
       });
       tRetry.addEventListener('click', () => {
         if (pendingImageData) startTransformSimulation(pendingImageData);
@@ -734,6 +736,8 @@
         const overlay = document.getElementById('transformOverlay');
         overlay.style.display = 'none';
         if (transformTimer) clearTimeout(transformTimer);
+        tRetry.classList.add('hidden');
+        tAccept.classList.add('hidden');
         const dataURL = pendingImageData;
         const options = {
           corsenabled: true,
@@ -1248,6 +1252,10 @@
   function startTransformSimulation(dataURL) {
     transformDone = false;
     const output = document.getElementById('transformOutputPreview');
+    const retryBtn = document.getElementById('transformRetryBtn');
+    const acceptBtn = document.getElementById('transformAcceptBtn');
+    if (retryBtn) retryBtn.classList.add('hidden');
+    if (acceptBtn) acceptBtn.classList.add('hidden');
     if (!output) return;
     output.innerHTML = '';
     const dot = document.createElement('div');
@@ -1260,6 +1268,8 @@
       img.src = dataURL;
       output.appendChild(img);
       transformDone = true;
+      if (retryBtn) retryBtn.classList.remove('hidden');
+      if (acceptBtn) acceptBtn.classList.remove('hidden');
     }, 3000);
   }
 
