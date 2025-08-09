@@ -2337,7 +2337,6 @@
         if (obj.stroke) obj.set('stroke', '#000000');
       }
       applyOperation(group);
-      const center = getVisibleCenter();
       const vpt = canvas.viewportTransform;
       const inv = fabric.util.invertTransform(vpt);
       const dpr = window.devicePixelRatio || 1;
@@ -2355,10 +2354,10 @@
       group.set({
         scaleX: scaleFactor,
         scaleY: scaleFactor,
-        left: center.x,
-        top: center.y,
-        originX: 'center',
-        originY: 'center'
+        left: 0,
+        top: 0,
+        originX: 'left',
+        originY: 'top'
       });
       canvas.add(group);
       canvas.setActiveObject(group);
