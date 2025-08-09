@@ -643,6 +643,12 @@
         menu.classList.remove('hidden');
         // Mark button as active (blue text)
         btn.classList.add('active');
+        // Focus the custom form textarea so users can type immediately
+        const ta = document.getElementById('customFormInput');
+        if (ta) {
+          ta.focus();
+          ta.select();
+        }
       } else {
         // Hide menu and remove active state
         menu.classList.add('hidden');
