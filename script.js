@@ -1343,33 +1343,51 @@
       return typeof target.get === 'function' && 'fill' in target;
     }
 
-    function objectOperation(target) {
-      if (target._objects && Array.isArray(target._objects) && target._objects.length > 0) {
-        return objectOperation(target._objects[0]);
-      }
-      return target.operation === 'cut' ? 'cut' : 'engrave';
-    }
-    const operation = objectOperation(activeObject);
-    cutBtn.textContent = operation === 'cut' ? 'ENGRAVING' : 'CUTTING';
-
-    function isFilled(target) {
+    function operationStatus(target, ops) {
       if (target._objects && Array.isArray(target._objects)) {
-        return target._objects.every(child => isFilled(child));
+        target._objects.forEach(child => operationStatus(child, ops));
+        return;
+      }
+      ops.add(target.operation === 'cut' ? 'cut' : 'engrave');
+    }
+    const opSet = new Set();
+    operationStatus(activeObject, opSet);
+    if (opSet.size === 1) {
+      cutBtn.textContent = opSet.has('cut') ? 'ENGRAVING' : 'CUTTING';
+    } else {
+      cutBtn.textContent = 'CNC MODE';
+    }
+
+    function fillStatus(target, states) {
+      if (target._objects && Array.isArray(target._objects)) {
+        target._objects.forEach(child => fillStatus(child, states));
+        return;
       }
       if (target.type === 'line' || target instanceof fabric.Line) {
-        return false;
+        states.add('line');
+        return;
+      }
+      if (target.type === 'i-text' || target.type === 'image' || target.isMeasurement) {
+        states.add('fill');
+        return;
       }
       if (typeof target.get === 'function' && 'fill' in target) {
         const currentFill = target.get('fill');
-        return currentFill && currentFill !== 'transparent';
+        const filled = currentFill && currentFill !== 'transparent';
+        states.add(filled ? 'fill' : 'line');
       }
-      return false;
     }
 
     const showFillToggle = supportsFill(activeObject);
     if (showFillToggle) {
       fillToggle.classList.remove('hidden');
-      fillBtn.textContent = isFilled(activeObject) ? 'LINE' : 'FILL';
+      const fillSet = new Set();
+      fillStatus(activeObject, fillSet);
+      if (fillSet.size === 1) {
+        fillBtn.textContent = fillSet.has('fill') ? 'LINE' : 'FILL';
+      } else {
+        fillBtn.textContent = 'BODY';
+      }
     } else {
       fillToggle.classList.add('hidden');
     }
