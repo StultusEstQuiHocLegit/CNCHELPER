@@ -32,6 +32,7 @@
 
   // Data for transformation overlay
   let pendingImageData = null;
+  let pendingSvgData = null;
   let transformTimer = null;
   let transformDone = false;
 
@@ -729,34 +730,16 @@
         tAccept.classList.add('hidden');
       });
       tRetry.addEventListener('click', () => {
-        if (pendingImageData) startTransformSimulation(pendingImageData);
+        if (pendingImageData) startTransform(pendingImageData);
       });
       tAccept.addEventListener('click', () => {
-        if (!pendingImageData) return;
+        if (!pendingSvgData) return;
         const overlay = document.getElementById('transformOverlay');
         overlay.style.display = 'none';
         if (transformTimer) clearTimeout(transformTimer);
         tRetry.classList.add('hidden');
         tAccept.classList.add('hidden');
-        const dataURL = pendingImageData;
-        const options = {
-          corsenabled: true,
-          colorsampling: 0,
-          numberofcolors: 2,
-          mincolorratio: 0,
-          colorquantcycles: 3,
-          layering: 0,
-          strokewidth: 0,
-          linefilter: false,
-          roundcoords: 1,
-          desc: false,
-          viewbox: false,
-          blurradius: 0,
-          blurdelta: 20,
-          pal: [[0, 0, 0], [255, 255, 255]]
-        };
-        ImageTracer.imageToSVG(dataURL, function(svgString) {
-          fabric.loadSVGFromString(svgString, (objects, options) => {
+        fabric.loadSVGFromString(pendingSvgData, (objects, options) => {
             const group = fabric.util.groupSVGElements(objects, options);
             const center = getVisibleCenter();
             const vpt = canvas.viewportTransform;
@@ -788,8 +771,7 @@
             canvas.requestRenderAll();
             markUnsaved();
             saveHistory();
-          });
-        }, options);
+        });
       });
     }
 
@@ -1260,11 +1242,12 @@
     if (!overlay || !inputPreview) return;
     inputPreview.src = dataURL;
     overlay.style.display = 'flex';
-    startTransformSimulation(dataURL);
+    startTransform(dataURL);
   }
 
-  function startTransformSimulation(dataURL) {
+  function startTransform(dataURL) {
     transformDone = false;
+    pendingSvgData = null;
     const output = document.getElementById('transformOutputPreview');
     const retryBtn = document.getElementById('transformRetryBtn');
     const acceptBtn = document.getElementById('transformAcceptBtn');
@@ -1276,15 +1259,33 @@
     dot.className = 'orbit-dot';
     output.appendChild(dot);
     if (transformTimer) clearTimeout(transformTimer);
-    transformTimer = setTimeout(() => {
-      output.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = dataURL;
-      output.appendChild(img);
-      transformDone = true;
-      if (retryBtn) retryBtn.classList.remove('hidden');
-      if (acceptBtn) acceptBtn.classList.remove('hidden');
-    }, 3000);
+    fetch('TRAMANNTRANSFORMER.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: dataURL })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then(data => {
+        output.innerHTML = '';
+        if (data.svg) {
+          pendingSvgData = data.svg;
+          output.innerHTML = data.svg;
+          if (acceptBtn) acceptBtn.classList.remove('hidden');
+        } else {
+          console.error('Transformer error:', data.error || 'No SVG returned');
+          output.innerHTML = '<p class="transform-error">Error generating SVG.</p>';
+        }
+        transformDone = true;
+        if (retryBtn) retryBtn.classList.remove('hidden');
+      })
+      .catch(err => {
+        console.error('Transformer fetch error:', err);
+        output.innerHTML = '<p class="transform-error">Error generating SVG.</p>';
+        if (retryBtn) retryBtn.classList.remove('hidden');
+      });
   }
 
   // Handle selection events to show popovers
