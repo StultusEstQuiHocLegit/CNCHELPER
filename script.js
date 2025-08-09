@@ -2248,6 +2248,7 @@
 
     createBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       const prompt = ta.value.trim();
       if (!prompt) return;
       const original = prompt;
