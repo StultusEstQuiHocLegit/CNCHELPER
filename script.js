@@ -2214,7 +2214,7 @@
       canvas.requestRenderAll();
     }, function(obj, data) {
       // Reviver: mark grid lines as non-interactive
-      if (data && data.isGrid) {
+      if (obj && typeof obj.set === 'function' && data && data.isGrid) {
         obj.set({ selectable: false, evented: false });
       }
       return obj;
@@ -2231,7 +2231,7 @@
       updateAxisLabels();
       canvas.requestRenderAll();
     }, function(obj, data) {
-      if (data && data.isGrid) {
+      if (obj && typeof obj.set === 'function' && data && data.isGrid) {
         obj.set({ selectable: false, evented: false });
       }
       return obj;
