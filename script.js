@@ -775,8 +775,10 @@
       });
     }
 
-    document.getElementById('cutToggleBtn').addEventListener('click', () => {
+    const cutBtn = document.getElementById('cutToggleBtn');
+    cutBtn.addEventListener('click', () => {
       toggleCutColor();
+      cutBtn.textContent = cutBtn.textContent === 'CUTTING' ? 'ENGRAVING' : 'CUTTING';
     });
 
     // Fill toggle button handler: toggles between outline and filled
@@ -784,6 +786,7 @@
     if (fillBtn) {
       fillBtn.addEventListener('click', () => {
         toggleFill();
+        fillBtn.textContent = fillBtn.textContent === 'FILL' ? 'LINE' : 'FILL';
       });
     }
 
@@ -1319,31 +1322,54 @@
     const cutToggle = document.getElementById('cutToggle');
     const layerControls = document.getElementById('layerControls');
     const removeControl = document.getElementById('removeControl');
+    const cutBtn = document.getElementById('cutToggleBtn');
+    const fillToggle = document.getElementById('fillToggle');
+    const fillBtn = document.getElementById('fillToggleBtn');
     cutToggle.classList.remove('hidden');
     layerControls.classList.remove('hidden');
     removeControl.classList.remove('hidden');
-    // Determine if fill toggle should be visible: it applies to shapes
-    const fillToggle = document.getElementById('fillToggle');
+
     function supportsFill(target) {
       if (!target) return false;
-      // Groups: if any child supports fill
       if (target._objects && Array.isArray(target._objects)) {
         return target._objects.some(child => supportsFill(child));
       }
-      // Text, images and measurement objects do not support fill toggle
       if (target.type === 'i-text' || target.type === 'image' || target.isMeasurement) {
         return false;
       }
-      // Lines have no meaningful fill
       if (target.type === 'line' || target instanceof fabric.Line) {
         return false;
       }
-      // Objects with a fill property support fill toggle
       return typeof target.get === 'function' && 'fill' in target;
     }
+
+    function objectOperation(target) {
+      if (target._objects && Array.isArray(target._objects) && target._objects.length > 0) {
+        return objectOperation(target._objects[0]);
+      }
+      return target.operation === 'cut' ? 'cut' : 'engrave';
+    }
+    const operation = objectOperation(activeObject);
+    cutBtn.textContent = operation === 'cut' ? 'ENGRAVING' : 'CUTTING';
+
+    function isFilled(target) {
+      if (target._objects && Array.isArray(target._objects)) {
+        return target._objects.every(child => isFilled(child));
+      }
+      if (target.type === 'line' || target instanceof fabric.Line) {
+        return false;
+      }
+      if (typeof target.get === 'function' && 'fill' in target) {
+        const currentFill = target.get('fill');
+        return currentFill && currentFill !== 'transparent';
+      }
+      return false;
+    }
+
     const showFillToggle = supportsFill(activeObject);
     if (showFillToggle) {
       fillToggle.classList.remove('hidden');
+      fillBtn.textContent = isFilled(activeObject) ? 'LINE' : 'FILL';
     } else {
       fillToggle.classList.add('hidden');
     }
