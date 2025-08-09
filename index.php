@@ -11,7 +11,7 @@
   <div id="topBar">
     <div class="toolbar-left">
       <button id="addTextBtn" title="add text">ADD TEXT</button>
-      <button id="uploadBtn" title="upload image">UPLOAD SVG</button>
+      <button id="uploadBtn" title="upload image">UPLOAD IMAGE</button>
       <button id="addFormBtn" title="add a shape/form">ADD FORM</button>
     </div>
     <div class="toolbar-right">
@@ -20,7 +20,7 @@
   </div>
 
   <!-- Hidden file input for uploads -->
-  <input type="file" id="fileInput" accept=".svg,.png,.jpeg,.jpg,.jpg,.svg" multiple style="display:none">
+  <input type="file" id="fileInput" accept=".svg,.png,.jpg,.jpeg" multiple style="display:none">
 
   <!-- Canvas wrapper with axes -->
   <div id="canvasContainer">

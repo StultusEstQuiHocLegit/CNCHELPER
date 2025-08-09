@@ -1222,14 +1222,15 @@
         });
       };
       reader.readAsText(file);
-    } else {
+    } else if (ext === 'png' || ext === 'jpeg' || ext === 'jpg') {
       reader.onload = function(evt) {
         pendingImageData = evt.target.result;
         showTransformOverlay(pendingImageData);
       };
-      if (ext === 'png' || ext === 'jpeg' || ext === 'jpg' || ext === 'bmp') {
-        reader.readAsDataURL(file);
-      }
+      reader.readAsDataURL(file);
+    } else {
+      alert('Unsupported file type. Please upload an SVG, PNG, JPG, or JPEG file.');
+      return;
     }
     // reset file input so same file can be uploaded again
     e.target.value = '';
