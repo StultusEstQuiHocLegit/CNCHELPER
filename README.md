@@ -1,15 +1,20 @@
 # TRAMANNPROJECTS CNCHELPER
 
 A web-based tool for preparing and arranging black-and-white SVGs for laser cutting or engraving.
-To allow sending paths directly, add the following to the URL: https://www.tnxapi.com/CNCHELPER/index.php?email=hi@tnxapi.com&company=test&ms=mm&&w=600h=400
 
-this is the base URL: https://www.tnxapi.com/CNCHELPER/index.php
-and then you can add additional attributes after the "?", if you want multiple ones, combine them with "&", possible attributes are:
-- email for sending paths directly: ?email=hi@tnxapi.com
-- company name: &company=test
-- measurement system (mm or inch): &ms=mm
-- work area width &w=600
-- work area height: &h=400
+To allow sending paths directly, append parameters to the base URL:
+
+https://www.tnxapi.com/CNCHELPER/index.php?email=hi@tnxapi.com&company=test&ms=mm&w=600&h=400
+
+Base URL: https://www.tnxapi.com/CNCHELPER/index.php
+Parameters (combine with `&` after the `?`):
+- email for sending paths directly: `?email=hi@tnxapi.com`
+- company name: `&company=test`
+- measurement system (mm or inch): `&ms=mm`
+- work area width: `&w=600`
+- work area height: `&h=400`
+
+If any of these values are missing or invalid, the defaults `ms=mm`, `w=1000` and `h=1000` are used.
 
 
 ## 🔧 Features

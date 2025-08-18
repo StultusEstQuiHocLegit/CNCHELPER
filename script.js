@@ -455,6 +455,8 @@
 
   // Initialize the application
   function init() {
+    const params = new URLSearchParams(window.location.search);
+
     // Load saved cookies
     const savedUnit = loadPref('cnc_unit');
     if (savedUnit) unit = savedUnit;
@@ -462,6 +464,39 @@
     const savedHeight = parseFloat(loadPref('cnc_height'));
     if (!isNaN(savedWidth) && savedWidth > 0) workWidth = savedWidth;
     if (!isNaN(savedHeight) && savedHeight > 0) workHeight = savedHeight;
+
+    // Override defaults from URL parameters
+    const msParam = params.get('ms');
+    if (msParam !== null) {
+      const ms = msParam.toLowerCase();
+      if (ms === 'mm' || ms === 'inch') {
+        unit = ms;
+      } else {
+        unit = 'mm';
+      }
+      savePref('cnc_unit', unit);
+    }
+    const wParam = params.get('w');
+    if (wParam !== null) {
+      const wVal = parseFloat(wParam);
+      if (!isNaN(wVal) && wVal > 0) {
+        workWidth = wVal;
+      } else {
+        workWidth = 1000;
+      }
+      savePref('cnc_width', workWidth);
+    }
+    const hParam = params.get('h');
+    if (hParam !== null) {
+      const hVal = parseFloat(hParam);
+      if (!isNaN(hVal) && hVal > 0) {
+        workHeight = hVal;
+      } else {
+        workHeight = 1000;
+      }
+      savePref('cnc_height', workHeight);
+    }
+
     const savedFont = loadPref('cnc_font');
 
     // Set unit toggle text and click handler (simple toggle between mm and inch)
@@ -678,7 +713,6 @@
     });
 
     // Handle email/company URL parameters
-    const params = new URLSearchParams(window.location.search);
     const emailParam = params.get('email');
     const companyParam = params.get('company');
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
