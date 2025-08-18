@@ -1,4 +1,4 @@
-# TRAMANNPROJECTS CNCHELPER
+# TRAMANN CNC HELPER
 
 A web-based tool for preparing and arranging black-and-white SVGs for laser cutting or engraving.
 To allow sending paths directly, add the following to the URL: https://www.tnxapi.com/CNCHELPER/index.php?email=hi@tnxapi.com&company=test+company&ms=mm&&w=600h=400
